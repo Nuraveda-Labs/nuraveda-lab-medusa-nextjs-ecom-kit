@@ -1,36 +1,118 @@
+<div align="center">
+
 # Medusa + Next.js E-commerce Kit
 
-An open-source, production-shaped e-commerce starter: a **Next.js 16** storefront
-on top of a **Medusa 2.x** backend. Cart, checkout, customer accounts, order
-history, product catalog, transactional email hooks, and analytics wiring — all
-already assembled, so you start from a working store instead of a blank page.
+### An open-source, production-shaped headless commerce starter — a **Next.js 16** storefront on a **Medusa 2.x** backend.
+
+Cart, checkout, customer accounts, order history, product catalog, transactional
+email, and analytics — already wired together, so you start from a working store
+instead of a blank page.
+
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Medusa](https://img.shields.io/badge/Medusa-2.13-6C5CE7?logo=medusa&logoColor=white)](https://medusajs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
+
+</div>
+
+---
+
+## Table of contents
+
+- [Why this kit](#why-this-kit)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Tech stack](#tech-stack)
+- [Quick start](#quick-start)
+- [Checkout & payments](#checkout--payments)
+- [Project structure](#project-structure)
+- [Make it yours](#make-it-yours)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Why this kit
+
+Most headless-commerce tutorials stop at "hello products". This one ships the
+parts that are actually annoying to build: a real multi-step **checkout**, a
+**customer account** area with order history, **transactional email** for every
+order stage, an **analytics** layer, and env-driven **branding** so one codebase
+can become any store. It is intentionally provider-agnostic — swap in Stripe,
+PayPal, or any gateway when you're ready to take money.
 
 > This template ships neutral placeholder branding and products for you to
 > replace with your own.
 
 ---
 
-## What's inside
+## Features
 
-**Storefront (`/` — Next.js 16, App Router, React 19)**
-- Product catalog + product detail pages (`/shop`, `/shop/[slug]`)
-- Cart and checkout flow (`/cart`, `/checkout`)
-- Customer accounts: register / login / profile / order history (`/account/*`)
-- Content pages: home, about, FAQ, policies, contact
-- SEO baked in: metadata, JSON-LD, sitemap, `robots.txt`, `llms.txt`
-- Env-driven branding (name, colours, currency, socials) via `src/config/brand.ts`
-- Optional analytics: Google Analytics + Meta Pixel / Conversions API
+| | |
+|---|---|
+| 🛍️ **Storefront** | Home, catalog (`/shop`, `/shop/[slug]`), cart, and a multi-step checkout |
+| 👤 **Customer accounts** | Register, login, profile, and order history (`/account/*`) |
+| 💳 **Checkout & payments** | Generic **bank-transfer** flow + a **placeholder (demo)** payment route — provider-agnostic |
+| 📧 **Transactional email** | Order-received, payment, shipped, delivered & canceled emails via any SMTP provider |
+| 🎨 **Env-driven branding** | Name, colours, currency, socials & policy copy in one `brand.ts` — no code edits |
+| 🔎 **SEO out of the box** | Metadata, JSON-LD, `sitemap.xml`, `robots.txt`, and `llms.txt` |
+| 📈 **Analytics** | Optional Google Analytics + Meta Pixel / Conversions API |
+| 🧱 **Headless backend** | Medusa 2.x: products, variants, pricing, inventory, regions, admin dashboard |
+| 🧑‍💻 **Typed end-to-end** | TypeScript everywhere, `tsc --noEmit` clean |
 
-**Backend (`/medusa` — Medusa 2.x)**
-- Product / variant / pricing / inventory modules
-- Region + currency configuration
-- A seed script with generic placeholder products to get you running
-- Admin dashboard (Medusa Admin) out of the box
+---
 
-**Payments**
-- Ships with a **placeholder** payment step so checkout works immediately.
-- Swap in your own provider (Stripe, PayPal, etc.) — see
-  [Payments](#payments) below.
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Client["🌐 Browser"]
+        U["Shopper"]
+    end
+
+    subgraph Storefront["▲ Next.js 16 storefront"]
+        direction TB
+        Pages["App Router pages<br/>shop · cart · checkout · account"]
+        API["Route handlers<br/>/api/orders · /api/payments · /api/webhooks"]
+    end
+
+    subgraph Backend["🟣 Medusa 2.x backend"]
+        direction TB
+        Store["Store & Admin API"]
+        Admin["Admin dashboard"]
+    end
+
+    DB[("🐘 PostgreSQL")]
+    Mail["✉️ SMTP / email"]
+    Analytics["📈 GA · Meta Pixel"]
+
+    U --> Pages
+    Pages --> API
+    Pages -->|products, cart| Store
+    API -->|draft orders, payments| Store
+    Store --> DB
+    Admin --> DB
+    API --> Mail
+    Pages --> Analytics
+```
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Storefront | Next.js 16 (App Router) · React 19 · TypeScript 5 |
+| Styling | Tailwind CSS 4 |
+| Backend | Medusa 2.13 (headless commerce) |
+| Database | PostgreSQL |
+| Email | Nodemailer (any SMTP / transactional provider) |
+| Tooling | ESLint 9 · Corepack / pnpm (backend) · npm (storefront) |
 
 ---
 
@@ -39,49 +121,74 @@ already assembled, so you start from a working store instead of a blank page.
 **Prerequisites:** Node 20+, a PostgreSQL database, and (optionally) Redis.
 
 ```bash
-# 1. Backend (Medusa)
+# 1. Backend (Medusa) — in the medusa/ folder
 cd medusa
-cp .env.template .env         # fill in DATABASE_URL etc.
+cp .env.template .env          # fill in DATABASE_URL etc.
 npm install
 npx medusa db:migrate
-npm run seed                  # loads the placeholder catalog
-npm run dev                   # Medusa on http://localhost:9000 (admin at /app)
+npm run seed                   # loads the placeholder catalog
+npm run dev                    # Medusa on http://localhost:9000 (admin at /app)
 
 # 2. Storefront (Next.js) — in a second terminal, from the repo root
-cp .env.example .env.local    # set MEDUSA_* keys from your Medusa instance
+cp .env.example .env.local     # set MEDUSA_* keys from your Medusa instance
 npm install
-npm run dev                   # storefront on http://localhost:3000
+npm run dev                    # storefront on http://localhost:3000
 ```
 
 Get `MEDUSA_PUBLISHABLE_KEY` and `MEDUSA_REGION_ID` from the Medusa admin
-(Settings → Publishable API Keys, and Settings → Regions) and paste them into
-`.env.local`.
+(**Settings → Publishable API Keys**, and **Settings → Regions**) and paste them
+into `.env.local`.
+
+> 💡 `build-all.sh` builds both the backend and the storefront in one shot.
 
 ---
 
-## Make it yours
+## Checkout & payments
 
-| To change… | Edit |
-|---|---|
-| Store name, tagline, colours, currency, socials | `.env.local` / `.env` (see `src/config/brand.ts`) |
-| Products | Medusa admin, or `medusa/src/scripts/seed.ts` |
-| Home / about / FAQ / policies copy | `src/app/*/page.tsx` |
-| Logo & imagery | `public/` |
-| Payment provider | `src/app/api/payments/` (see below) |
+The kit ships two provider-agnostic payment paths so checkout is complete and
+runnable **without signing up for anything**:
 
-Branding is intentionally env-driven — for most cosmetic changes you only touch
-`.env`, no code.
+- **Bank Transfer** — a manual-payment flow. The order is created, a payment
+  reference is generated, and the customer is emailed account details to
+  complete the transfer.
+- **Placeholder (Demo)** — creates the order and marks it paid via
+  `/api/payments/placeholder`, then lands on `/checkout/success`.
+  **No real charge — do not use it to take real money.**
 
-## Payments
+```mermaid
+sequenceDiagram
+    actor C as Shopper
+    participant SF as Next.js checkout
+    participant O as /api/orders
+    participant P as /api/payments/placeholder
+    participant M as Medusa backend
+    participant E as Email
 
-The kit ships with a **placeholder gateway** so the checkout flow is complete
-and runnable without signing up for anything. It creates the order and marks
-payment as a stub — **do not use it to take real money.**
+    Note over C,E: Bank Transfer flow
+    C->>SF: Choose "Bank Transfer"
+    SF->>O: POST order (bank_transfer)
+    O->>M: Create draft order
+    O->>E: Email payment reference + details
+    O-->>SF: paymentReference, payToEmail
+    SF-->>C: Show bank-transfer instructions
 
-To go live, replace the placeholder in `src/app/api/payments/` with your
-provider of choice. Medusa has first-party support for Stripe and others; wire
-the provider server-side and point the checkout's payment step at it. Search the
-code for `PAYMENT_PROVIDER` and the `placeholder` payment route for the seams.
+    Note over C,E: Placeholder (Demo) flow
+    C->>SF: Choose "Placeholder (Demo)"
+    SF->>O: POST order (placeholder)
+    O->>M: Create draft order
+    SF->>P: POST { storefrontOrderId }
+    P->>M: Convert draft → order, mark paid
+    P-->>SF: ok
+    SF-->>C: Redirect to /checkout/success
+```
+
+### Going live
+
+Replace the placeholder in [`src/app/api/payments/`](src/app/api/payments/) with
+your provider of choice. Medusa has first-party support for Stripe and others;
+wire the provider **server-side** and point the checkout's payment step at it.
+Search the code for `PAYMENT_PROVIDER` and the `placeholder` payment route for
+the seams.
 
 ---
 
@@ -89,21 +196,58 @@ code for `PAYMENT_PROVIDER` and the `placeholder` payment route for the seams.
 
 ```
 .
-├── src/                  # Next.js storefront (App Router)
-│   ├── app/              # routes: shop, cart, checkout, account, content pages, api/
-│   ├── components/       # UI components
-│   ├── config/brand.ts   # env-driven brand config
-│   ├── data/             # product fetch/shape helpers
-│   └── lib/              # medusa client, mailer, helpers
-├── medusa/               # Medusa 2.x backend
-│   └── src/scripts/seed.ts  # placeholder catalog seed
-├── public/               # static assets / images
-└── .env.example          # storefront env template
+├── src/                       # Next.js storefront (App Router)
+│   ├── app/                   # routes: shop, cart, checkout, account, content, api/
+│   ├── components/            # UI components
+│   ├── config/brand.ts        # env-driven brand config (single source of truth)
+│   ├── data/                  # product fetch/shape helpers
+│   └── lib/                   # medusa client, mailer, shipping, payment helpers
+├── medusa/                    # Medusa 2.x backend
+│   └── src/
+│       ├── api/               # custom API routes
+│       ├── modules/           # custom modules
+│       ├── subscribers/       # event subscribers (order lifecycle → email)
+│       ├── workflows/         # custom workflows
+│       └── scripts/seed.ts    # placeholder catalog seed
+├── public/                    # static assets / images
+├── scripts/                   # ops helpers (deploy, stale-draft cleanup)
+├── build-all.sh               # build backend + storefront
+└── .env.example               # storefront env template
 ```
 
-## Tech stack
+---
 
-Next.js 16 · React 19 · TypeScript · Tailwind CSS · Medusa 2.13 · PostgreSQL
+## Make it yours
+
+| To change… | Edit |
+|---|---|
+| Store name, tagline, colours, currency, socials | `.env.local` / `.env` (see [`src/config/brand.ts`](src/config/brand.ts)) |
+| Products | Medusa admin, or [`medusa/src/scripts/seed.ts`](medusa/src/scripts/seed.ts) |
+| Home / about / FAQ / policies copy | `src/app/*/page.tsx` |
+| Logo & imagery | `public/` |
+| Payment provider | [`src/app/api/payments/`](src/app/api/payments/) |
+
+Branding is intentionally env-driven — for most cosmetic changes you only touch
+`.env`, no code.
+
+---
+
+## Deployment
+
+- **Storefront** — deploys to any Node host or Vercel. Set the same env vars
+  from `.env.example` in your host's dashboard.
+- **Backend** — deploy Medusa to any Node host with a managed PostgreSQL (and
+  optional Redis). See the [Medusa deployment docs](https://docs.medusajs.com/deployments).
+- Point the storefront's `MEDUSA_BACKEND_URL` at your deployed backend.
+
+---
+
+## Contributing
+
+Issues and PRs are welcome. Please keep changes typed (`npx tsc --noEmit` must
+stay clean) and run `npm run lint` before opening a PR.
+
+---
 
 ## License
 
@@ -111,5 +255,9 @@ Next.js 16 · React 19 · TypeScript · Tailwind CSS · Medusa 2.13 · PostgreSQ
 
 ---
 
-*Built from a real, live storefront and opened up as a starting point. If it
-saved you time, a ⭐ is appreciated.*
+<div align="center">
+
+*Built from a real, live storefront and opened up as a starting point.*
+**If it saved you time, a ⭐ is appreciated.**
+
+</div>
