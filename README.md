@@ -245,7 +245,8 @@ Branding is intentionally env-driven — for most cosmetic changes you only touc
 ## Contributing
 
 Issues and PRs are welcome. Please keep changes typed (`npx tsc --noEmit` must
-stay clean) and run `npm run lint` before opening a PR.
+stay clean) and run `npm run lint` before opening a PR. See
+[CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide.
 
 ---
 
