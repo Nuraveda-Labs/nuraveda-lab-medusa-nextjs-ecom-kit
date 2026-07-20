@@ -17,6 +17,8 @@ instead of a blank page.
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
+**🔗 Live demo:** **[exotic420budz.com](https://exotic420budz.com/)** — a real store running on this exact stack.
+
 </div>
 
 ---

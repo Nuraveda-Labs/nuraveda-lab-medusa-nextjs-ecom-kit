@@ -8,6 +8,9 @@ This project is mirrored to two hosts — contribute wherever you're comfortable
 - **GitHub:** https://github.com/Nuraveda-Labs/nuraveda-lab-medusa-nextjs-ecom-kit
 - **GitLab:** https://gitlab.com/nuraveda-lab/nuraveda-lab-medusa-nextjs-ecom-kit
 
+By participating, you agree to abide by our
+[Code of Conduct](./CODE_OF_CONDUCT.md).
+
 ---
 
 ## Ways to contribute
