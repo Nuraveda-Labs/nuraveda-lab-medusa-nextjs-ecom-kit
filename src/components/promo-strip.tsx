@@ -19,17 +19,14 @@ export function PromoStrip() {
     try {
       saved = window.localStorage.getItem(dismissKey(PROMO_CODE)) ?? "0";
     } catch {}
-    setDismissed(saved === "1");
+    const expires = PROMO_EXPIRES_AT ? new Date(PROMO_EXPIRES_AT).getTime() : NaN;
+    const expired = Number.isFinite(expires) && Date.now() > expires;
+    setDismissed(saved === "1" || expired);
     setMounted(true);
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!PROMO_TEXT || !mounted || dismissed) return null;
-
-  if (PROMO_EXPIRES_AT) {
-    const expires = new Date(PROMO_EXPIRES_AT).getTime();
-    if (Number.isFinite(expires) && Date.now() > expires) return null;
-  }
 
   function dismiss() {
     try {
