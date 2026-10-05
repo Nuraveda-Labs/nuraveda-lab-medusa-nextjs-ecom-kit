@@ -55,7 +55,7 @@ async function loadOrder(container: SubscriberArgs["container"], id: string): Pr
       ],
       filters: { id },
     });
-    return (data?.[0] ?? null) as OrderSnapshot | null;
+    return (data?.[0] ?? null) as unknown as OrderSnapshot | null;
   } catch {
     return null;
   }
