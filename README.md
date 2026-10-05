@@ -254,7 +254,7 @@ stay clean) and run `npm run lint` before opening a PR. See
 
 ## License
 
-[MIT](./LICENSE) © Nuraveda Labs. Use it, fork it, ship your store.
+[MIT](./LICENSE) © Tejas Karan Agrawal. Use it, fork it, ship your store.
 
 ---
 
