@@ -59,7 +59,9 @@ jobs:
           cache: npm
           cache-dependency-path: medusa/package-lock.json
       - run: npm ci --no-audit --no-fund
-      # `medusa build` reports type errors but still exits 0, so typecheck separately.
-      - run: npx tsc --noEmit -p .
+      # `medusa build` generates .medusa/types (imported by src/scripts/seed.ts),
+      # so it runs first. It reports type errors but still exits 0, so typecheck
+      # separately afterwards.
       - run: npm run build
+      - run: npx tsc --noEmit -p .
       - run: npm run test:integration:http
